@@ -32,5 +32,19 @@ jobs:
       - name: 🚀 Deploy to WSL 2
         shell: powershell
         run: |
-          wsl.exe -d Ubuntu -- ssh -o StrictHostKeyChecking=no shubh@localhost "docker pull shivaays/html-ci:latest && docker run -d -p 8089:80 shivaays/html-ci:latest"
-
+          wsl.exe -d Ubuntu -- bash -c "
+            ssh -o StrictHostKeyChecking=no shubh@localhost '
+              # Check if port 8089 is in use
+              if lsof -i :8089; then
+                echo \"Port 8089 is in use. Killing the process...\"
+                # Get the PID and kill the process using port 8089
+                pid=\$(lsof -t -i :8089)
+                kill -9 \$pid
+              else
+                echo \"Port 8089 is free.\"
+              fi
+              # Run the Docker container after killing the process (or if free)
+              docker pull shivaays/html-ci:latest &&
+              docker run -d -p 8089:80 shivaays/html-ci:latest
+            '
+          "
