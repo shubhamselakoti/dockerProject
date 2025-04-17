@@ -34,11 +34,11 @@ jobs:
         run: |
           wsl.exe -d Ubuntu -- bash -c "
             ssh -o StrictHostKeyChecking=no shubh@localhost '
-              # Check if port 8089 is in use
-              if lsof -i :8089; then
+              # Check if port 8089 is in use using ss
+              if ss -tuln | grep :8089; then
                 echo \"Port 8089 is in use. Killing the process...\"
                 # Get the PID and kill the process using port 8089
-                pid=\$(lsof -t -i :8089)
+                pid=\$(ss -tuln | grep :8089 | awk '\''{print \$6}'\'')
                 kill -9 \$pid
               else
                 echo \"Port 8089 is free.\"
@@ -48,3 +48,4 @@ jobs:
               docker run -d -p 8089:80 shivaays/html-ci:latest
             '
           "
+          
