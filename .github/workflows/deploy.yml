@@ -30,23 +30,15 @@ jobs:
           tags: shivaays/html-ci:latest
 
       - name: 🚀 Deploy to WSL 2
-        shell: bash
+        shell: powershell
         run: |
-          wsl.exe -d Ubuntu"
-            port=8089
-            pid=\$(netstat -tulnp 2>/dev/null | awk '\$4 ~ \":\$port\" {print \$7}' | cut -d'/' -f1)
-            if [ ! -z \"\$pid\" ]; then
-              echo \"Port \$port is in use by PID \$pid. Killing it...\"
-              kill -9 \$pid
-            else
-              echo \"Port \$port is free.\"
+          wsl.exe -d Ubuntu -- ssh -o StrictHostKeyChecking=no shubh@localhost "
+            container_id=\$(docker ps --format '{{.ID}} {{.Ports}}' | grep '0.0.0.0:8089' | awk '{print \$1}');
+            if [ ! -z \"\$container_id\" ]; then
+              docker stop \$container_id;
+              docker rm \$container_id;
             fi
-
-            docker rm -f html-ci || true
-            docker pull shivaays/html-ci:latest
-            docker run -d -p 8089:80 --name html-ci shivaays/html-ci:latest
+            docker pull shivaays/html-ci:latest &&
+            docker run -d -p 8089:80 shivaays/html-ci:latest
           "
-
-
-
 
