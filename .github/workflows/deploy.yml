@@ -2,12 +2,13 @@ name: Build and Deploy to Localhost
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -38,6 +39,9 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan -H localhost >> ~/.ssh/known_hosts
 
-      - name: 🚀 Deploy to WSL 2
+      - name: Deploy to WSL 2
         run: |
-          wsl.exe -d Ubuntu "ssh -o StrictHostKeyChecking=no shubh@localhost 'docker pull shivaays/html-ci:latest && docker compose down && docker compose up -d'"
+          wsl.exe sh -c "
+            ssh -o StrictHostKeyChecking=no shubh@localhost \
+            'docker pull shivaays/html-ci:latest && docker compose down && docker compose up -d'
+          "
