@@ -32,7 +32,7 @@ jobs:
       - name: 🚀 Deploy to WSL 2 via SSH
         shell: powershell
         run: |
-          wsl.exe -d Ubuntu -- ssh -o StrictHostKeyChecking=no shubh@localhost "docker pull shivaays/html-ci:latest && docker-compose down && docker-compose up -d"
+          wsl.exe -d Ubuntu -- ssh -o StrictHostKeyChecking=no shubh@localhost "docker pull shivaays/html-ci:latest && cd /mnt/d/dockerProject && docker-compose down && docker-compose up -d"
 
 
 
