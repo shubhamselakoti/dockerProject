@@ -28,12 +28,16 @@ jobs:
           push: true
           tags: shivaays/html-ci:latest
 
-      - name: Copy SSH Key to GitHub Actions Runner
+      - name: Set up SSH agent
         uses: webfactory/ssh-agent@v0.5.3
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+      - name: Add localhost to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H localhost >> ~/.ssh/known_hosts
+
       - name: Deploy to WSL 2
         run: |
           ssh -o StrictHostKeyChecking=no shubh@localhost "docker pull shivaays/html-ci:latest && docker compose down && docker compose up -d"
-
