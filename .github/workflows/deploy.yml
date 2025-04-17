@@ -32,17 +32,18 @@ jobs:
       - name: 🚀 Deploy to WSL 2
         shell: powershell
         run: |
-          # Check if port 8089 is in use
-          $pid = wsl.exe -d Ubuntu -- netstat -tuln | Select-String ":8089" | ForEach-Object { ($_ -split " ")[1].Split(":")[0] }
+          # Define a new variable name to avoid conflicts
+          $port_pid = wsl.exe -d Ubuntu -- netstat -tuln | Select-String ":8089" | ForEach-Object { ($_ -split " ")[1].Split(":")[0] }
           
-          if ($pid) {
+          if ($port_pid) {
             # Kill the process if it's already using port 8089
-            wsl.exe -d Ubuntu -- kill $pid
+            wsl.exe -d Ubuntu -- kill $port_pid
           }
 
           # Pull the Docker image and start the container
           wsl.exe -d Ubuntu -- docker pull shivaays/html-ci:latest
           wsl.exe -d Ubuntu -- docker run -d -p 8089:80 shivaays/html-ci:latest
+
 
 
 
