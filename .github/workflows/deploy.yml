@@ -33,15 +33,7 @@ jobs:
         uses: webfactory/ssh-agent@v0.5.3
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: Add localhost to known hosts
-        shell: powershell
-        run: |
-          if (!(Test-Path "$HOME\.ssh")) {
-            New-Item -ItemType Directory -Path "$HOME\.ssh" -Force
-          }
-          ssh-keyscan -H localhost | Out-File -Append -Encoding ascii "$HOME\.ssh\known_hosts"
-
+          
       - name: Deploy to WSL 2
         shell: powershell
         run: |
