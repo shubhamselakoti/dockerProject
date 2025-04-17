@@ -9,35 +9,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: ⬇️ Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Docker Buildx
+      - name: 🛠️ Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Login to DockerHub
+      - name: 🔐 Login to DockerHub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push Docker image
+      - name: 🏗️ Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
           tags: shivaays/html-ci:latest
 
-      - name: Set up SSH agent
+      - name: 🔑 Set up SSH agent
         uses: webfactory/ssh-agent@v0.5.3
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Add localhost to known hosts
+      - name: 🧾 Add localhost to known hosts
         run: |
           mkdir -p ~/.ssh
           ssh-keyscan -H localhost >> ~/.ssh/known_hosts
 
-      - name: Deploy to WSL 2
+      - name: 🚀 Deploy to WSL 2
         run: |
-          ssh -o StrictHostKeyChecking=no shubh@localhost "docker pull shivaays/html-ci:latest && docker compose down && docker compose up -d"
+          ssh -o StrictHostKeyChecking=no shubh@localhost \
+          "wsl.exe -d Ubuntu -- bash -c 'docker pull shivaays/html-ci:latest && docker compose down && docker compose up -d'"
