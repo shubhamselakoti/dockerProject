@@ -30,23 +30,23 @@ jobs:
           tags: shivaays/html-ci:latest
 
       - name: 🚀 Deploy to WSL 2
-        shell: powershell
+        shell: bash
         run: |
           wsl.exe -d Ubuntu -- bash -c "
-            # Find if the port 8089 is being used
-            pid=\$(lsof -t -i:8089)
-            
-            if [ -n \"\$pid\" ]; then
-              echo 'Port 8089 is in use. Killing the process...'
+            port=8089
+            pid=\$(netstat -tulnp 2>/dev/null | awk '\$4 ~ \":\$port\" {print \$7}' | cut -d'/' -f1)
+            if [ ! -z \"\$pid\" ]; then
+              echo \"Port \$port is in use by PID \$pid. Killing it...\"
               kill -9 \$pid
             else
-              echo 'Port 8089 is free.'
+              echo \"Port \$port is free.\"
             fi
 
-            # Run the Docker container after killing the process (or if free)
-            docker pull shivaays/html-ci:latest &&
-            docker run -d -p 8089:80 shivaays/html-ci:latest
+            docker rm -f html-ci || true
+            docker pull shivaays/html-ci:latest
+            docker run -d -p 8089:80 --name html-ci shivaays/html-ci:latest
           "
+
 
 
 
