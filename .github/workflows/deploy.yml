@@ -34,9 +34,15 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Deploy to WSL 2
+      - name: Add localhost to known hosts
+        shell: powershell
         run: |
-          wsl.exe -d Ubuntu "
-            ssh -o StrictHostKeyChecking=no shubh@localhost \
-            'docker pull shivaays/html-ci:latest && docker compose down && docker compose up -d'
-          "
+          if (!(Test-Path "$HOME\.ssh")) {
+            New-Item -ItemType Directory -Path "$HOME\.ssh" -Force
+          }
+          ssh-keyscan -H localhost | Out-File -Append -Encoding ascii "$HOME\.ssh\known_hosts"
+
+      - name: Deploy to WSL 2
+        shell: powershell
+        run: |
+          wsl.exe bash -c "ssh -o StrictHostKeyChecking=no shubh@localhost 'docker pull shivaays/html-ci:latest && docker compose down && docker compose up -d'"
