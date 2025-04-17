@@ -33,10 +33,18 @@ jobs:
         shell: powershell
         run: |
           wsl.exe -d Ubuntu -- bash -c "
-            # Install net-tools (which includes netstat) if it's not installed
+            # Install net-tools, grep, and gawk (for awk) if they are missing
             if ! command -v netstat &> /dev/null; then
               echo 'netstat command not found. Installing it...'
               sudo apt-get update && sudo apt-get install -y net-tools
+            fi
+            if ! command -v grep &> /dev/null; then
+              echo 'grep command not found. Installing it...'
+              sudo apt-get install -y grep
+            fi
+            if ! command -v awk &> /dev/null; then
+              echo 'awk command not found. Installing it...'
+              sudo apt-get install -y gawk
             fi
 
             # Check if port 8089 is in use using netstat
@@ -52,5 +60,6 @@ jobs:
             docker pull shivaays/html-ci:latest &&
             docker run -d -p 8089:80 shivaays/html-ci:latest
           "
+
 
 
