@@ -32,7 +32,7 @@ jobs:
       - name: 🚀 Deploy to WSL 2
         shell: bash
         run: |
-          wsl.exe -d Ubuntu -- bash -c "
+          wsl.exe -d Ubuntu"
             port=8089
             pid=\$(netstat -tulnp 2>/dev/null | awk '\$4 ~ \":\$port\" {print \$7}' | cut -d'/' -f1)
             if [ ! -z \"\$pid\" ]; then
