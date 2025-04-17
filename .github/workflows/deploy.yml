@@ -33,22 +33,9 @@ jobs:
         shell: powershell
         run: |
           wsl.exe -d Ubuntu -- bash -c "
-            # Install net-tools, grep, and gawk (for awk) if they are missing
-            if ! command -v netstat &> /dev/null; then
-              echo 'netstat command not found. Installing it...'
-              sudo apt-get update && sudo apt-get install -y net-tools
-            fi
-            if ! command -v grep &> /dev/null; then
-              echo 'grep command not found. Installing it...'
-              sudo apt-get install -y grep
-            fi
-            if ! command -v awk &> /dev/null; then
-              echo 'awk command not found. Installing it...'
-              sudo apt-get install -y gawk
-            fi
-
-            # Check if port 8089 is in use using netstat
-            pid=\$(netstat -tuln | grep ':8089' | awk '{print \$7}' | cut -d'/' -f1)
+            # Find if the port 8089 is being used
+            pid=\$(lsof -t -i:8089)
+            
             if [ -n \"\$pid\" ]; then
               echo 'Port 8089 is in use. Killing the process...'
               kill -9 \$pid
