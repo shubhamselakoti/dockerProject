@@ -32,14 +32,7 @@ jobs:
       - name: 🚀 Deploy to WSL 2
         shell: powershell
         run: |
-          wsl.exe -d Ubuntu -- ssh -o StrictHostKeyChecking=no shubh@localhost '
-            container_id=$(docker ps --format "{{.ID}} {{.Ports}}" | grep "0.0.0.0:8089" | awk "{print \$1}")
-            if [ ! -z "$container_id" ]; then
-              docker stop $container_id
-              docker rm $container_id
-            fi
-            docker pull shivaays/html-ci:latest
-            docker run -d -p 8089:80 shivaays/html-ci:latest
-          '
+          wsl.exe -d Ubuntu -- bash -c "container_id=\$(docker ps --format '{{.ID}} {{.Ports}}' | grep '0.0.0.0:8089' | awk '{print \$1}'); if [ ! -z \"\$container_id\" ]; then docker stop \$container_id; docker rm \$container_id; fi; docker pull shivaays/html-ci:latest; docker run -d -p 8089:80 shivaays/html-ci:latest"
+
 
 
