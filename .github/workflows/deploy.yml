@@ -33,7 +33,4 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Deploy to WSL 2
-        run: |
-          ssh -v -T -o StrictHostKeyChecking=no shubh@localhost "docker pull shivaays/html-ci:latest && docker compose down && docker compose up -d"
 
