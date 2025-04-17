@@ -35,7 +35,7 @@ jobs:
 
       - name: Deploy to WSL 2
         run: |
-          ssh -o StrictHostKeyChecking=no shubh@169.254.70.207 << 'EOF'
+          ssh -o StrictHostKeyChecking=no shubh@localhost << 'EOF'
             docker pull shivaays/html-ci:latest
             docker compose down
             docker compose up -d
