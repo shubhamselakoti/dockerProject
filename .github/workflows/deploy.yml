@@ -36,7 +36,7 @@ jobs:
 
       - name: Deploy to WSL 2
         run: |
-          wsl.exe sh -c "
+          wsl.exe -d -Ubuntu "
             ssh -o StrictHostKeyChecking=no shubh@localhost \
             'docker pull shivaays/html-ci:latest && docker compose down && docker compose up -d'
           "
