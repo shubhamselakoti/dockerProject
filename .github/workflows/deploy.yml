@@ -39,9 +39,11 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan -H localhost >> ~/.ssh/known_hosts
 
-      - name: Deploy to WSL 2
+      - name: Add localhost to known hosts
+        shell: pwsh
         run: |
-          wsl.exe sh -c "
-            ssh -o StrictHostKeyChecking=no shubh@localhost \
-            'docker pull shivaays/html-ci:latest && docker compose down && docker compose up -d'
-          "
+          if (!(Test-Path "$HOME\.ssh")) {
+            New-Item -ItemType Directory -Path "$HOME\.ssh"
+          }
+          ssh-keyscan -H localhost | Out-File -Append -Encoding ascii "$HOME\.ssh\known_hosts"
+
