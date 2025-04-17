@@ -33,17 +33,16 @@ jobs:
         shell: powershell
         run: |
           wsl.exe -d Ubuntu -- bash -c "
-            # Check if ss is installed, and install iproute2 if necessary
-            if ! command -v ss &> /dev/null; then
-              echo 'ss command not found. Installing iproute2...'
-              sudo apt-get update && sudo apt-get install -y iproute2
+            # Install net-tools (which includes netstat) if it's not installed
+            if ! command -v netstat &> /dev/null; then
+              echo 'netstat command not found. Installing it...'
+              sudo apt-get update && sudo apt-get install -y net-tools
             fi
 
-            # Check if port 8089 is in use using ss
-            if ss -tuln | grep :8089; then
+            # Check if port 8089 is in use using netstat
+            pid=\$(netstat -tuln | grep ':8089' | awk '{print \$7}' | cut -d'/' -f1)
+            if [ -n \"\$pid\" ]; then
               echo 'Port 8089 is in use. Killing the process...'
-              # Get the PID and kill the process using port 8089
-              pid=\$(ss -tuln | grep :8089 | awk '\''{print \$6}'\'')
               kill -9 \$pid
             else
               echo 'Port 8089 is free.'
@@ -53,4 +52,5 @@ jobs:
             docker pull shivaays/html-ci:latest &&
             docker run -d -p 8089:80 shivaays/html-ci:latest
           "
+
 
