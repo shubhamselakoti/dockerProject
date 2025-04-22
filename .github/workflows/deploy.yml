@@ -25,8 +25,7 @@ jobs:
           context: .
           push: true
           tags: shivaays/html-ci:latest
-          builder: default
-
+          
 
       - name: 🚀 Deploy to WSL 2 via SSH
         shell: powershell
