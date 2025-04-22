@@ -2,43 +2,28 @@ pipeline {
   agent any
 
   environment {
-    DOCKER_IMAGE = 'shivaays/html-ci:latest'
-    DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds')
+    DOCKER_IMAGE = 'shivaays/html-ci'
   }
 
   stages {
     stage('Checkout Code') {
       steps {
-        git branch: 'main', url: 'https://github.com/yourusername/yourrepo.git'
+        git branch: 'main', url: 'https://github.com/shubhamselakoti/dockerProject.git'
       }
     }
 
     stage('Build Docker Image') {
       steps {
-        sh 'docker build -t $DOCKER_IMAGE .'
-      }
-    }
-
-    stage('Login to Docker Hub') {
-      steps {
-        sh '''
-          echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin
-        '''
-      }
-    }
-
-    stage('Push Docker Image') {
-      steps {
-        sh 'docker push $DOCKER_IMAGE'
+        echo '🛠️ Building Docker image...'
+        bat "docker build -t %DOCKER_IMAGE% ."
       }
     }
 
     stage('Deploy via WSL2') {
       steps {
-        // Replace "shubh" with your actual WSL2 username if different
+        echo '🚀 Running docker-compose inside WSL2...'
         bat '''
           wsl.exe -d Ubuntu -- bash -c "
-            docker pull $DOCKER_IMAGE &&
             cd /mnt/d/dockerProject &&
             docker-compose down &&
             docker-compose up -d
@@ -46,14 +31,32 @@ pipeline {
         '''
       }
     }
+
+    stage('Show Webpage Link') {
+      steps {
+        writeFile file: 'web-link.html', text: '''
+          <html>
+            <body>
+              <h2>✅ Web App is Live!</h2>
+              <p><a href="http://localhost:8081" target="_blank">👉 Open Webpage</a></p>
+            </body>
+          </html>
+        '''
+        publishHTML(target: [
+          reportName: 'Open Web App',
+          reportDir: '.',
+          reportFiles: 'web-link.html',
+          keepAll: true,
+          alwaysLinkToLastBuild: true,
+          allowMissing: false
+        ])
+      }
+    }
   }
 
   post {
-    failure {
-      echo '❌ Deployment failed.'
-    }
     success {
-      echo '✅ Deployment successful. App is live on http://localhost:8081'
+      echo '✅ Your web app is live at http://localhost:8081'
     }
   }
 }
