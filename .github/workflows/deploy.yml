@@ -19,22 +19,12 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: shivaays/html-ci:latest
-          
+      - name: Build and push Docker image (Standard Docker)
+        run: |
+          docker build -t shivaays/html-ci:latest .
+          docker push shivaays/html-ci:latest
 
       - name: 🚀 Deploy to WSL 2 via SSH
         shell: powershell
         run: |
           wsl.exe -d Ubuntu -- ssh -o StrictHostKeyChecking=no shubh@localhost "docker pull shivaays/html-ci:latest && cd /mnt/d/dockerProject && docker-compose down && docker-compose up -d"
-
-
-
-
-
-
-
